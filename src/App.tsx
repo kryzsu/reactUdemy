@@ -1,26 +1,48 @@
 import React, {ChangeEvent} from 'react';
 import './App.css';
-import {UserInput} from "./UserInput/UserInput";
-import {UserOutput} from "./UserOutput/UserOutput";
+import {ValidatonComponent} from "./ValidatonComponent/ValidatonComponent";
+import {ChartComponent} from "./ChartComponent/ChartComponent";
 
 interface AppState {
-  username: string
+  textLength: number;
+  letterList: string[];
 }
 
 export class App extends React.Component<{}, AppState> {
 
-  state: AppState = {username: 'demo'};
+  state: AppState = {textLength: 0, letterList: []};
 
-  setUsernameHandler = (event: ChangeEvent<HTMLInputElement>) => {
-    this.setState({username: event.target.value})
+  inputChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+    this.setState(
+        {textLength: event.target.value.length,
+        letterList: event.target.value.split('')}
+        )
   };
 
+    removeLetter = (index: number) => {
+        const newLetterList =  [ ...this.state.letterList];
+        newLetterList.splice(index, 1);
+
+        this.setState(
+            {textLength: newLetterList.length,
+                letterList: newLetterList}
+        )
+    };
+
   render() {
+
+    const chartConponentList = this.state.letterList.map( (actLetter: string, actIndex: number) =>
+        <ChartComponent letter={actLetter} removeLetter={this.removeLetter} index={actIndex}></ChartComponent>);
+
     return (
         <div className="App">
-          <UserInput  initValue={this.state.username} userNameChanged={this.setUsernameHandler}/>
-          <UserOutput username={this.state.username}/>
-          <UserOutput username={this.state.username}/>
+            <input onChange={this.inputChangeHandler} value={this.state.letterList.join('')}/>
+            <p>
+                {this.state.textLength}
+            </p>
+            <ValidatonComponent textLength={this.state.textLength}></ValidatonComponent>
+
+            {chartConponentList}
         </div>
     );
   }
